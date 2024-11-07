@@ -1,8 +1,10 @@
 package visitor_example;
 
 import parser.*;
-import parser.Boolean;
-import parser.Number;
+import parser.ast.*;
+import parser.ast.Number;
+
+import parser.ast.Boolean;
 
 public class TypeCheckingVisitor implements ASTNodeVisitor<VisitorExample.ExcelType> {
 
@@ -28,7 +30,7 @@ public class TypeCheckingVisitor implements ASTNodeVisitor<VisitorExample.ExcelT
     }
 
     @Override
-    public VisitorExample.ExcelType visitVariable(Variable n) {
+    public VisitorExample.ExcelType visitString(ExcelString n) {
         return null;
     }
 

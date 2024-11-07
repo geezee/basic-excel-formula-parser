@@ -1,8 +1,9 @@
 package visitor_example;
 
 import parser.*;
-import parser.Boolean;
-import parser.Number;
+import parser.ast.*;
+import parser.ast.Boolean;
+import parser.ast.Number;
 
 public class VisitorExample implements ASTNodeVisitor<VisitorExample.ExcelType> {
 
@@ -22,7 +23,7 @@ public class VisitorExample implements ASTNodeVisitor<VisitorExample.ExcelType> 
     }
 
     @Override
-    public ExcelType visitVariable(Variable n) {
+    public ExcelType visitString(ExcelString n) {
         throw new RuntimeException("Cells need more context to know their types");
     }
 

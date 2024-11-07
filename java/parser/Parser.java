@@ -18,7 +18,7 @@ public class Parser {
 
     private static String[] tokenize(String input) {
         input.replaceAll("e +", "e+").replaceAll("e -", "e-").replaceAll("e+ ", "e+").replaceAll("e- ", "e-")
-             .replaceAll("> =", ">=").replaceAll("< =", "<=").replaceAll("< >", "<>");
+                .replaceAll("> =", ">=").replaceAll("< =", "<=").replaceAll("< >", "<>");
         for (String s : new String[] { ":", ",", "\\(", "\\)", "\\*", "\\+", "/", "-", "%", "\\^", "=", "<", "<=", ">=", "<>" }) {
             input = input.replaceAll(s, " " + s + " ");
         }
@@ -104,9 +104,9 @@ public class Parser {
         if (!name.matches("^[a-zA-Z_][a-zA-Z0-9_.]+$")) return Optional.empty();
         cursor++;
         for (BasicFunction fun : BasicFunction.values()) {
-            if (fun.value.equalsIgnoreCase(name)) {
+            if (fun.toString().equalsIgnoreCase(name)) {
                 assertNotEOF();
-                if (!tokens[cursor].equals("(")) throw new ParseException("Expected ( after function name " + fun.value);
+                if (!tokens[cursor].equals("(")) throw new ParseException("Expected ( after function name " + fun.toString());
                 cursor++;
                 ArrayList<ASTNode> arguments = new ArrayList<>();
                 while (true) {
@@ -124,27 +124,27 @@ public class Parser {
 
     private Optional<ASTNode> parseBasicExpr() {
         return parseBoolean()
-                 .or(this::parseNumber)
-                 .or(this::parseCellOrCellRange)
-                 .or(this::parseNameOrFunc)
-                 .or(() -> {
-                     assertNotEOF();
-                     if (tokens[cursor].equals("(")) {
-                         cursor++;
-                         ASTNode result = parseExpr();
-                         if (cursor >= tokens.length || !tokens[cursor].equals(")")) {
+                .or(this::parseNumber)
+                .or(this::parseCellOrCellRange)
+                .or(this::parseNameOrFunc)
+                .or(() -> {
+                    assertNotEOF();
+                    if (tokens[cursor].equals("(")) {
+                        cursor++;
+                        ASTNode result = parseExpr();
+                        if (cursor >= tokens.length || !tokens[cursor].equals(")")) {
                             throw new ParseException("Expected closed parenthesis, unexpected EOF");
-                         }
-                         return Optional.of(result);
-                     } else if (tokens[cursor].equals("+")) {
-                         cursor++;
-                         return parseBasicExpr();
-                     } else if (tokens[cursor].equals("-")) {
-                         cursor++;
-                         return parseBasicExpr().map(Negate::new);
-                     }
-                     return Optional.empty();
-                 });
+                        }
+                        return Optional.of(result);
+                    } else if (tokens[cursor].equals("+")) {
+                        cursor++;
+                        return parseBasicExpr();
+                    } else if (tokens[cursor].equals("-")) {
+                        cursor++;
+                        return parseBasicExpr().map(Negate::new);
+                    }
+                    return Optional.empty();
+                });
     }
 
     private BinaryOp parseBinaryOp() {
@@ -165,8 +165,8 @@ public class Parser {
 
         while (true) {
             parseBasicExpr().ifPresentOrElse(
-                arithmeticParts::add,
-                () -> { throw new ParseException("Expected number, boolean, cell, range, or function call"); }
+                    arithmeticParts::add,
+                    () -> { throw new ParseException("Expected number, boolean, cell, range, or function call"); }
             );
 
             if (cursor >= tokens.length || tokens[cursor].equals(",") || tokens[cursor].equals(")"))
@@ -179,9 +179,9 @@ public class Parser {
             int min_i = 0;
             for (int j=0; j<ops.size(); j++) if (ops.get(j).precedence < ops.get(min_i).precedence) min_i = j;
             arithmeticParts.set(min_i,
-                new Binary(arithmeticParts.get(min_i),
-                           ops.remove(min_i),
-                           arithmeticParts.remove(min_i+1)));
+                    new Binary(arithmeticParts.get(min_i),
+                            ops.remove(min_i),
+                            arithmeticParts.remove(min_i+1)));
         }
 
         return arithmeticParts.get(0);
